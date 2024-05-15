@@ -39,7 +39,8 @@ import java.util.List;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.zebra.sdk.comm.BluetoothConnection;                                  // using zebra sdk for print functionality
+import com.zebra.sdk.comm.BluetoothConnection;
+import com.zebra.sdk.btleComm.BluetoothLeConnection;                               // using zebra sdk for print functionality
 import com.zebra.sdk.comm.Connection;
 import com.zebra.sdk.printer.PrinterStatus;
 import com.zebra.sdk.comm.ConnectionException;
@@ -57,7 +58,7 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
   public BluetoothManager bluetoothManager;
   private boolean mScanning;
   public static Context context;
- 
+
   public static String EXTRA_DEVICE_ADDRESS = "device_address";
   private String mConnectedDeviceName = null;
   private static final Map<String, Promise> promiseMap = Collections.synchronizedMap(new HashMap<String, Promise>());
@@ -90,11 +91,11 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
   public static final int MESSAGE_CONNECTION_LOST = BluetoothService.MESSAGE_CONNECTION_LOST;
   public static final int MESSAGE_UNABLE_CONNECT = BluetoothService.MESSAGE_UNABLE_CONNECT;
 
-  public void getBluetoothManagerInstance(Context c) {                                        
+  public void getBluetoothManagerInstance(Context c) {
     this.bluetoothManager = (BluetoothManager) c.getSystemService(Context.BLUETOOTH_SERVICE);
     this.bluetoothAdapter = this.bluetoothManager.getAdapter();
   }
-  
+
   public RNZebraBluetoothPrinterModule(ReactApplicationContext reactContext,BluetoothService bluetoothService) {                  // Constructor
         super(reactContext);
         this.reactContext = reactContext;
@@ -118,13 +119,13 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
           // ignore
         }
   }
-  
+
   @Override
   public String getName() {
         return "RNZebraBluetoothPrinter";
   }
-  
-  private void emitRNEvent(String event, @Nullable WritableMap params) {                                                          // emit events to JavaScript        
+
+  private void emitRNEvent(String event, @Nullable WritableMap params) {                                                          // emit events to JavaScript
         getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(event, params);
   }
 
@@ -140,7 +141,7 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
 
   @ReactMethod
   public void isEnabledBluetooth(final Promise promise) {                                                     //check if the bluetooth is enabled or not
-    
+
     if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
       promise.resolve(false);
     }
@@ -149,7 +150,7 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
     }
   }
 
-  @ReactMethod 
+  @ReactMethod
   public void scanDevices(final Promise promise) {                                                    //scan for unpaired devices
     if(this.bluetoothAdapter == null || !this.bluetoothAdapter.isEnabled()) {
       promise.reject("BT NOT ENABLED");
@@ -157,13 +158,13 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
       cancelDiscovery();
       int permissionChecked = ContextCompat.checkSelfPermission(reactContext,
           android.Manifest.permission.ACCESS_COARSE_LOCATION);
-   
+
       if (permissionChecked == PackageManager.PERMISSION_DENIED) {
-     
+
         ActivityCompat.requestPermissions(reactContext.getCurrentActivity(),
             new String[] { android.Manifest.permission.ACCESS_COARSE_LOCATION }, 1);
       }
-   
+
       if (!this.bluetoothAdapter.startDiscovery()) {
 
         promise.reject("DISCOVER", "NOT_STARTED");
@@ -272,7 +273,7 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
       } catch (Exception e) {
         promise.reject(E_LAYOUT_ERROR, e);
       }
-     
+
     }
   }
 
@@ -296,7 +297,7 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
       Log.e(TAG,e.getMessage());
     }
   }
-  
+
   private final BroadcastReceiver discoverReceiver = new BroadcastReceiver() {
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -376,7 +377,7 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
       promise.reject("BT NOT ENABLED");
     }
   }
-  
+
   public static void sleep(int ms) {
     try {
       Thread.sleep(ms);
@@ -395,7 +396,7 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
       Log.d("Error on disconnect", e.toString());
     }
   }
-  
+
   private byte[] getConfigLabel(ZebraPrinter printer, String label) {
     byte[] configLabel = null;
     String printLabel = label;
@@ -403,18 +404,18 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
       SGD.SET("device.languages", "zpl", connection);
 
       configLabel = printLabel.getBytes();
-     
+
     } catch (ConnectionException e) {
       Log.d("Connection err", e.toString());
     }
     return configLabel;
   }
-  
+
   @ReactMethod
   public void print(String device, String label,final Promise promise) {            //print functionality for zebra printer
     boolean success = false;
     boolean loading = false;
-    connection = new BluetoothConnection(device);
+    connection = new BluetoothLeConnection(device, reactContext);
     try {
       loading = true;
       connection.open();
@@ -495,5 +496,5 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
                 break;
         }
       }
-  
+
     }

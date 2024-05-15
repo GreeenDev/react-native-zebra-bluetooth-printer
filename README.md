@@ -3,13 +3,13 @@
 
 ## Getting started
 
-`$ npm install react-native-zebra-bluetooth-printer --save`
+`$ npm install @greeendev/react-native-zebra-bluetooth-printer --save`
 
 
 
 ### Mostly automatic installation
 
-`$ react-native link react-native-zebra-bluetooth-printer`
+`$ react-native link @greeendev/react-native-zebra-bluetooth-printer`
 
 Note : For react-native > 0.59, don't use above command it uses auto-linking.
 
@@ -48,7 +48,7 @@ Note : For react-native > 0.59, don't use above command it uses auto-linking.
 
 # RNZebraBluetoothPrinter
 
-RNZebraBluetoothPrinter is a module for Bluetooth management and supports print functionality for zebra bluetooth printers ( only ble devices ). 
+RNZebraBluetoothPrinter is a module for Bluetooth management and supports print functionality for zebra bluetooth printers ( only ble devices ).
 It includes features like bluetooth enable/disable, pair/unpair a BLE/Bluetooth device, scan for nearby bluetooth devices and printing using bluetooth.
 ```javascript
 import RNZebraBluetoothPrinter from 'react-native-zebra-bluetooth-printer';
@@ -72,26 +72,26 @@ RNZebraBluetoothPrinter.enableBluetooth().then((res) => {
 
 3. disableBluetooth == > async function,
 	Android: disables bluetooth if bluetooth is switched on.
-	iOS: simply resolves by nil.	
+	iOS: simply resolves by nil.
 ```javascript
 RNZebraBluetoothPrinter.disableBluetooth().then((res) => {
 	//do something with res
 })
-```	
+```
 4. scanDevices == > async function, scans for available nearby bluetooth devices for a specific period of time.
 ```javascript
 RNZebraBluetoothPrinter.scanDevices().then((deviceArray) => {
 	//do something with res
 })
-```	
-5. pairedDevices == > async function, 	
+```
+5. pairedDevices == > async function,
 	Android: returns already paired devices.
 	iOS: resolves to nil.
 ```javascript
 RNZebraBluetoothPrinter.pairedDevices().then((deviceArray) => {
 	//do something with deviceArray
 })
-```	
+```
 6. connectDevice == > async function, for both android and iOS
 ```javascript
 RNZebraBluetoothPrinter.connectDevice(deviceAddress).then((res) => {
@@ -99,7 +99,7 @@ RNZebraBluetoothPrinter.connectDevice(deviceAddress).then((res) => {
 	//for android, device address is mac address
 	//for iOS, device address is a long string like 0C347F9F-2881-9CCB-43B0-205976944626
 })
-```	
+```
 7. unpairDevice == > async function,
 	Android: unpair/disconnect a paired device from paired device list.
 ```javascript
@@ -107,7 +107,7 @@ RNZebraBluetoothPrinter.unpairDevice(deviceAddress).then((res) => {
 	//do something with res
 })
 ```
-	iOS: function resolves to nil.		
+	iOS: function resolves to nil.
 8. print == > async function, prints specific zpl string from a zebra printer for both android and iOS.	CPCL strings can also be printed using this for Android.
 
 For example :
@@ -126,5 +126,4 @@ iOS
 RNZebraBluetoothPrinter.print(zpl).then((res)=>{
 	//do something with res
 })
-```	
-  
+```
