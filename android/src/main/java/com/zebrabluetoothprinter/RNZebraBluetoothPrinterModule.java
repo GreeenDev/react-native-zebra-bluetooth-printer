@@ -412,6 +412,49 @@ public class RNZebraBluetoothPrinterModule extends ReactContextBaseJavaModule im
   }
 
   @ReactMethod
+  public void printCommon(String device, String label,final Promise promise) {            //print functionality for zebra printer
+    boolean success = false;
+    boolean loading = false;
+    connection = new BluetoothConnection(device, reactContext);
+    try {
+      loading = true;
+      connection.open();
+    } catch (ConnectionException e) {
+      disconnect();
+      Log.d("Connection err", e.toString());
+      loading = false;
+      success = false;
+      promise.reject("Unable to establish connection.Please try again!!!");
+    }
+    if (connection.isConnected()) {
+      try {
+        Log.d("Connection estd", "here");
+
+        ZebraPrinter zebraPrinter = ZebraPrinterFactory.getInstance(connection);
+        PrinterStatus status = zebraPrinter.getCurrentStatus();
+
+        String pl = SGD.GET("device.languages", connection);
+
+        byte[] configLabel = getConfigLabel(zebraPrinter, label);
+        connection.write(configLabel);
+        sleep(200);
+        success = true;
+        loading = false;
+       promise.resolve(success);
+
+      } catch (Exception err) {
+        success = false;
+        loading = false;
+        Log.d("Connection err", err.toString());
+        promise.reject(err.toString());
+      } finally {
+        disconnect();
+      }
+    }
+
+  }
+
+  @ReactMethod
   public void print(String device, String label,final Promise promise) {            //print functionality for zebra printer
     boolean success = false;
     boolean loading = false;
